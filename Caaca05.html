@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>caaça as bruxas</title>
+
+<!-- Fontes -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto+Condensed&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --fundo:#0b0a0d;
+    --roxo:#5b2a86;
+    --laranja:#e6572f;
+    --cinza:#d7d3da;
+    --preto:#000;
+  }
+  html,body{
+    height:100%;margin:0;
+    font-family:'Roboto Condensed',sans-serif;
+    background:var(--fundo);
+    color:var(--cinza);
+  }
+  h1,h2,h3{font-family:'Cinzel',serif;color:var(--laranja);}
+
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}
+  .card{
+    width:860px;max-width:100%;
+    background:rgba(255,255,255,0.02);
+    border:2px solid var(--roxo);
+    border-radius:18px;
+    padding:36px;
+    box-shadow:0 0 40px rgba(91,42,134,0.45);
+    text-align:center;
+  }
+  p{margin-top:8px;font-size:18px;color:var(--cinza);}
+
+  .choices{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-top:28px}
+  .btn{
+    flex:1 1 200px;
+    background:var(--preto); border:2px solid var(--laranja);
+    padding:22px;border-radius:14px;cursor:pointer;
+    font-family:'Cinzel',serif;font-size:20px;color:var(--laranja);
+    transition:all .25s ease;
+  }
+  .btn:hover{background:var(--laranja);color:var(--preto);transform:translateY(-4px)}
+
+  /* Overlay */
+  .overlay{
+    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:9999;
+    background:#000;visibility:hidden;opacity:0;transition:opacity .2s ease;
+    flex-direction:column;padding:30px;box-sizing:border-box;text-align:center;
+  }
+  .overlay.show{visibility:visible;opacity:1}
+
+  .final-text{
+    position:relative;z-index:10;color:var(--laranja);
+    font-family:'Cinzel',serif;font-size:42px;letter-spacing:4px;text-align:center;
+    opacity:0;transform:translateY(20px);transition:all .8s ease;margin-top:20px;
+  }
+  .final-text.show{opacity:1;transform:translateY(0)}
+  .date{font-size:26px;color:var(--roxo);margin-top:12px;font-weight:bold;}
+  .hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#aaa;font-size:13px}
+
+  /* Imagem de susto */
+  .scare-img{
+    max-width:90%;
+    max-height:90%;
+    animation: jumpScare 0.3s ease forwards;
+    z-index:20;
+    position:relative;
+    display:none;
+  }
+  @keyframes jumpScare {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Efeito de flashes amarelo e branco */
+  .flash{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    pointer-events:none;
+    opacity:0;
+    animation: flashEffect 0.8s ease forwards;
+  }
+  @keyframes flashEffect {
+    0%   { background:white;  opacity:0; }
+    10%  { background:white;  opacity:1; }
+    25%  { background:yellow; opacity:1; }
+    40%  { background:white;  opacity:0.6; }
+    55%  { background:yellow; opacity:1; }
+    70%  { background:white;  opacity:0.8; }
+    85%  { background:yellow; opacity:1; }
+    100% { background:white;  opacity:0; }
+  }
+
+  /* Enigma */
+  .riddle{
+    font-size:22px;color:var(--cinza);max-width:700px;
+    font-family:'Cinzel',serif;line-height:1.6;
+  }
+  input{
+    margin-top:16px;padding:10px;font-size:18px;
+    border:2px solid var(--roxo);border-radius:8px;width:80%;max-width:300px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Doces ou Travessuras?</h1>
+    <p>Escolha se tiver coragem...</p>
+    <div class="choices">
+      <button class="btn" id="doces">Doces</button>
+      <button class="btn" id="travessuras">Travessuras</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay Travessuras (susto) -->
+<div class="overlay" id="scare">
+  <img src="Fantasmas.png" alt="susto" class="scare-img" id="scareImg">
+  <div class="final-text" id="finalText">
+    caaça as bruxas
+    <div class="date">31/10</div>
+  </div>
+  <div class="hint">clique para reiniciar</div>
+</div>
+
+<!-- Overlay Doces (enigma) -->
+<div class="overlay" id="riddleOverlay">
+  <div class="riddle">
+    <p>Desde a pandemia ficou escondida,<br>
+    no TUSCA perdeu toda a batida.<br>
+    Prometeu voltar, mas só deu vexame,<br>
+    qual é a facul que só entra em campo com a mesma fome?</p>  
+
+    <p>Não é doce, nem é travessura,<br>
+    é só tradição de passar vergonha na disputa.<br>
+    Se o grito é alto mas a taça não vem,<br>
+    adivinha quem fica sem título também?</p>  
+
+    <input type="text" id="answer" placeholder="Sua resposta...">
+    <p id="feedback"></p>
+    <div class="date">31/10</div>
+  </div>
+  <div class="hint">digite a resposta e pressione Enter</div>
+</div>
+
+<audio id="screamAudio" preload="auto">
+  <source src="scream.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const scare=document.getElementById('scare');
+  const finalText=document.getElementById('finalText');
+  const scareImg=document.getElementById('scareImg');
+  const scream=document.getElementById('screamAudio');
+  const riddleOverlay=document.getElementById('riddleOverlay');
+  const answerInput=document.getElementById('answer');
+  const feedback=document.getElementById('feedback');
+
+  function startScare(){
+    riddleOverlay.classList.remove('show');
+    scare.classList.add('show');
+    scareImg.style.display='block';
+
+    // cria camada de flash amarelo/branco
+    const flash=document.createElement('div');
+    flash.classList.add('flash');
+    document.body.appendChild(flash);
+    setTimeout(()=>flash.remove(),900);
+
+    setTimeout(()=>{
+      finalText.classList.add('show');
+    },2000);
+    if(scream){scream.currentTime=0;scream.play().catch(()=>{});}
+  }
+  function resetScare(){
+    scare.classList.remove('show');
+    finalText.classList.remove('show');
+    scareImg.style.display='none';
+    if(scream){scream.pause();scream.currentTime=0;}
+  }
+
+  function showRiddle(){
+    riddleOverlay.classList.add('show');
+  }
+  function resetRiddle(){
+    riddleOverlay.classList.remove('show');
+    answerInput.value='';
+    feedback.textContent='';
+  }
+
+  document.getElementById('doces').onclick=showRiddle;
+  document.getElementById('travessuras').onclick=startScare;
+
+  scare.onclick=resetScare;
+  riddleOverlay.onclick=(e)=>{ if(e.target===riddleOverlay) resetRiddle(); };
+
+  answerInput.addEventListener('keypress',function(e){
+    if(e.key==='Enter'){
+      const ans=answerInput.value.trim().toLowerCase();
+      if(ans==="federal" || ans ==="ufscar"){
+        startScare();
+      } else {
+        feedback.textContent="Errou! Tenta de novo 😏";
+      }
+    }
+  });
+</script>
+</body>
+</html>
